@@ -1,0 +1,61 @@
+curl -X POST localhost:8080/users -d '{"first_name":"ks", "last_name":"zemsk", "email":"test@mail.com"}'
+
+
+docker pull mysql
+docker run -it --name mysql -e MYSQL_ROOT_PASSWORD=pass -p 3306:3306  mysql:latest
+
+docker exec -it mysql bash
+mysql -h localhost -P3306 -u root -p
+create schema users_db character set UTF8 collate utf8_bin;
+
+
+
+create table `users_db`.`users` (`id` bigint(20) not null auto_increment, `first_name` varchar(45) null, `last_name` varchar(45) null, `email` varchar(45) null, `date_created` varchar(45) null, primary key (`id`), unique index `email_UNIQUE` (`email` ASC));
+
+select * from `users_db`.`users`;
+TRUNCATE TABLE `users_db`.`users`;
+
+
+alter table `users_db`.`users` add column `status` varchar(45) not null after `email`, add column `password` varchar(32) not null after `status`;
+
+curl -X POST localhost:8080/users/login -d '{"email":"test@mail.com", "password":"pass"}'
+
+
+Cassandra
+docker run --name cassandra -d -e CASSANDRA_BROADCAST_ADDRESS=10.42.42.42 -p 7000:7000 -p 9042:9042 cassandra
+
+docker exec -it cassandra cqlsh
+create keyspace oauth with replication={'class':'SimpleStrategy', 'replication_factor':1};
+use oauth;
+describe tables;
+create table access_tokens(access_token varchar primary key, user_id bigint, client_id bigint,expires bigint);
+
+
+curl -X POST localhost:8080/oauth/access_token  -d '{"access_token":"abc1", "user_id":1, "client_id":1, "expires":123}’
+
+
+ curl -X GET localhost:8080/oauth/access_token/abc1
+
+
+curl -X GET localhost:8081/users/1
+
+curl -X GET -H "x-public: true" localhost:8081/users/1
+
+ES
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.8.0
+
+curl -X PUT --header "Content-Type: application/json" localhost:9200/items -d '{"settings": {"index": {"number_of_shards":4, "number_of_replicas":2}}}’
+
+curl -X POST localhost:9200/items/_search
+
+
+
+{
+  "equals": [
+    {
+      "field": "status",
+      "value": "pending"
+    }
+  ]
+}
+

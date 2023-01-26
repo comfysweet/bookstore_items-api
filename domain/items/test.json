@@ -1,0 +1,8 @@
+{
+  "equals": [
+    {
+      "field": "status",
+      "value": "pending"
+    }
+  ]
+}
